@@ -1,0 +1,20 @@
+When Unix was under construction, it hosted no guests. Every visitor was a
+contractor who was given a hard hat and pointed at some unfinished part of
+the barracks. Unfortunately, not only were human factors engineers never
+invited to work on the structure, their need was never anticipated or
+planned. Thus, many standard amenities, like flush toilets, central heating,
+and windows that open, are now extremely hard and expensive to retrofit
+into the structure. Nonetheless builders still marvel at its design, so much
+so that they don’t mind sleeping on the floor in rooms with no smoke
+detectors.
+For most of its history, Unix was the research vehicle for university and
+industrial researchers. With the explosion of cheap workstations, Unix has
+entered a new era, that of the delivery platform. This change is easy to date:
+it’s when workstation vendors unbundled their C compilers from their stan-
+dard software suite to lower prices for nondevelopers. The fossil record is a
+little unclear on the boundaries of this change, but it mostly occurred in
+1990. Thus, it’s only during the past few years that vendors have actually
+cared about the needs and desires of end users, rather than programmers.
+This explains why companies are now trying to write graphical user inter-
+faces to “replace” the need for the shell. We don’t envy these companies
+their task.
