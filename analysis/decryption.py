@@ -10,14 +10,24 @@ from cipher import vigener
 
 class Analyser:
 
-    def __init__(self, cipher: str = None, cipher_type='mono', lang='en'):
+    def __init__(self, cipher: str = None, fname: str = None, cipher_type='mono', lang='en'):
         """
         Analyser class providing tools to analyse and decrypt ciphers
         :param cipher: encoded stream to be decrypted
+        :param fname: file to read string from
         :param cipher_type: mono alphabetic by default
         :param lang: language to choose
         """
-        self.cipher_strip, self.blacklist_dict = vigener.strip_blacklist(cipher)
+        print(fname)
+        if fname and cipher:
+            raise ValueError("Only one argument can be provided at time: `cipher`, `file`")
+
+        if fname is not None:
+            with open(fname) as sample:
+                cipher = sample.read()
+
+        self.cipher = cipher
+        self.cipher_strip, self.blacklist_dict = vigener.strip_blacklist(cipher.lower())
 
         self.type = cipher_type
         self.lang = lang
@@ -29,6 +39,14 @@ class Analyser:
         "DataFrame with cipher character frequency"
 
         self.default_alphabet_dct = dict(zip(self.alphabet, (0 for _ in range(len(self.alphabet)))))
+
+    def get_cipher(self) -> str:
+        """Returns ciphered text"""
+        return self.cipher
+
+    def get_char_frequency(self):
+        """Returns bag of character occurence frequency"""
+        return Counter(self.cipher_strip)
 
     def plot_char_frequency(self):
         """Plot frequency analysis using pandas DataFrame"""
@@ -45,16 +63,21 @@ class Analyser:
         ax.legend(['Character count'])
         plt.show()
 
-    def decipher(self, rot=1) -> str:
+    def decipher(self, custom_key=None, key_id=0, rot=1) -> str:
         """
         Attempt to break cipher using rotation hyperparameter
+        :param custom_key: key to be used, if known
+        :param key_id: id of the key to be used for decryption
         :param rot: 'a' transforms to 'a' for 0, to 'b' for 1 (default)
         :return: decrypted stream
         """
 
         # Attempt to decrypt the key
-        key = self.decrypt_key()
-        print("Guessing key: '%s'" % key)
+        if custom_key is None:
+            key, _ = self.get_keys(key_id)
+            # print("Guessing key: '%s'" % key)
+        else:
+            key = custom_key
 
         # Apply the key to decode stream
         decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=rot, strip=False)
@@ -63,51 +86,71 @@ class Analyser:
 
         return decoded_stream
 
-    def decrypt_key(self) -> str:
+    def get_keys(self, key_id=0) -> (str, list):
         """
-        Attempt to decrypt the Vigener key   # TODO return multiple keys?
-        :return: decrypted key
+        Attempt to decrypt the Vigener key
+        :param key_id: length of the key to be returned
+        :return: decrypted key with highest probability, list of possible keys for different lengths
         """
 
         # Estimate the key length
-        est_length_list = self._est_key_len()
+        key_len_list = self._est_key_len()
+        if key_id >= len(key_len_list):
+            return '', []
 
-        print("Estimated Key length: {}".format(est_length_list))
+        # print("Estimated Key length: {}".format(key_len_list))
 
-        # TODO: handle choosing key by user
-        key_len = est_length_list[0]
+        key_list = []
 
-        key = ""
-        # Find optimal shift for each character of the key
-        for index in range(key_len):
-            cipher_strip = self.cipher_strip[index::key_len]
-            # Create new bag for stripped cipher
-            cipher_strip_bag = Counter(self.default_alphabet_dct)
-            cipher_strip_bag.update(cipher_strip)
-            cipher_strip_list = sorted(cipher_strip_bag.items())  # Sort by key to match def_occurence ordering
+        for k in key_len_list:
+            key = ""
 
-            # Convert occurence to frequency and put it into deque to rotate easily
-            strip_frequency = deque([v / len(cipher_strip_bag)*100 for k, v in cipher_strip_list])
+            # Find optimal shift for each character of the key
+            for index in range(k):
+                cipher_strip = self.cipher_strip[index::k]
+                # Create new bag for stripped cipher
+                cipher_strip_bag = Counter(self.default_alphabet_dct)
+                cipher_strip_bag.update(cipher_strip)
+                cipher_strip_list = sorted(cipher_strip_bag.items())  # Sort by key to match def_occurence ordering
 
-            # TODO: handle shifts by user
-            # Create shift matrix
-            shift_list = []
-            for i in range(len(strip_frequency)):
-                shift_list.append(strip_frequency.copy())
-                strip_frequency.rotate(1)
+                # Convert occurence to frequency and put it into deque to rotate easily
+                strip_frequency = deque([v / len(cipher_strip_bag)*100 for k, v in cipher_strip_list])
 
-            shift_matrix = np.array(shift_list)
-            shift_vector = np.matmul(shift_matrix, np.resize(self.letter_frequency, new_shape=shift_matrix[0].shape))
+                # TODO: handle shifts by user
+                # Create shift matrix
+                shift_list = []
+                for i in range(len(strip_frequency)):
+                    shift_list.append(strip_frequency.copy())
+                    strip_frequency.rotate(1)
 
-            shift_index = int(np.argmax(shift_vector))
+                shift_matrix = np.array(shift_list)
+                shift_vector = np.matmul(shift_matrix, np.resize(self.letter_frequency, new_shape=shift_matrix[0].shape))
 
-            # Rotate to the peak position letters to the peak position
-            shift_sample = deque(k for k, v in cipher_strip_list)
-            shift_sample.rotate(shift_index + 1)  # Number of rotations is shift index + 1
+                shift_index = int(np.argmax(shift_vector))
 
-            key += shift_sample[0]
+                # Rotate to the peak position letters to the peak position
+                shift_sample = deque(k for k, v in cipher_strip_list)
+                shift_sample.rotate(shift_index + 1)  # Number of rotations is shift index + 1
 
-        return key
+                key += shift_sample[0]
+
+            key_list.append(key)
+
+        return key_list[key_id], key_list
+
+    def get_key_len(self, key_ord=0):
+        """Get length of nth key where n is the order of the key"""
+        est_len_list = self._est_key_len()
+        if key_ord >= len(est_len_list):
+            return -1
+
+        return int(est_len_list[key_ord])
+
+    def get_key_len_list(self, res=3):
+        """Return list of estimated keys
+        :param res: Number of results to be returned in the list
+        """
+        return [int(i) for i in self._est_key_len(res=res)]
 
     def _est_key_len(self, batch_count=2, res=3, gcd=False) -> list:
         """
@@ -155,6 +198,7 @@ class Analyser:
                 # TODO eliminate multiplicators
                 pass
 
+            res = min(res, len(co_indexes))
             results = sorted(co_indexes.items(), key=lambda x: x[1], reverse=True)[:res]
 
             return [r[0] for r in results]
