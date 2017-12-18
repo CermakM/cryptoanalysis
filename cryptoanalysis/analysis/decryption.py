@@ -18,7 +18,6 @@ class Analyser:
         :param cipher_type: mono alphabetic by default
         :param lang: language to choose
         """
-        print(fname)
         if fname and cipher:
             raise ValueError("Only one argument can be provided at time: `cipher`, `file`")
 
@@ -27,7 +26,9 @@ class Analyser:
                 cipher = sample.read()
 
         self.cipher = cipher
-        self.cipher_strip, self.blacklist_dict = vigener.strip_blacklist(cipher.lower())
+
+        if cipher:
+            self.cipher_strip, self.blacklist_dict = vigener.strip_blacklist(cipher.lower())
 
         self.type = cipher_type
         self.lang = lang
