@@ -1,4 +1,5 @@
 flask
+flask_restful
 matplotlib
 numpy
 pandas
