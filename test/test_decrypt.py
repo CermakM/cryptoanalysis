@@ -1,4 +1,4 @@
-from analysis import decryption
+from cryptoanalysis.analysis import decryption
 
 with open("samples/TIKcipher2a.txt") as sample:
     encoded_text = sample.read()

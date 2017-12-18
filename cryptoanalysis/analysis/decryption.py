@@ -5,7 +5,7 @@ import pandas as pd
 
 from collections import Counter, deque
 from matplotlib import pyplot as plt
-from cipher import vigener
+from cryptoanalysis.cipher import vigener
 
 
 class Analyser:

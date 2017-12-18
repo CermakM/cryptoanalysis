@@ -3,7 +3,7 @@ Python API for encoding and decoding a stream with a given key using Caesar ciph
 Makes use of Vigener cipher - Caesar is just a simplification to key of lenght 1
 """
 
-import cipher.vigener as vigener
+import cryptoanalysis.cipher.vigener as vigener
 
 
 def encode(string: str, key: str) -> str:

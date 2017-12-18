@@ -3,7 +3,7 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
 
-from analysis import decryption
+from cryptoanalysis.analysis import decryption
 
 
 app = Flask(__name__)

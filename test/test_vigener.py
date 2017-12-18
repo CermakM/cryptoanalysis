@@ -2,9 +2,9 @@
 
 import os
 
-from cipher.vigener import encode, decode
-from common.util import match
-from common.exception import ValueMismatch
+from cryptoanalysis.cipher.vigener import encode, decode
+from cryptoanalysis.common.util import match
+from cryptoanalysis.common.exception import ValueMismatch
 
 
 VERBOSE = os.getenv('VERBOSE', 0)
