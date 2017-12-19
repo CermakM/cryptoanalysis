@@ -1,4 +1,4 @@
-"""Simplistic RESTful API"""
+"""Simplistic REST API"""
 
 from flask import Flask, jsonify
 from flask_restful import Resource, Api, reqparse
@@ -43,7 +43,8 @@ _load_default_response(ANALYSER)
 
 
 class Analysis(Resource):
-    def put(self):
+    @staticmethod
+    def put():
         global ANALYSER, DEFAULT_RESPONSE
 
         args = PARSER.parse_args()
@@ -55,12 +56,14 @@ class Analysis(Resource):
 
         return jsonify(DEFAULT_RESPONSE)
 
-    def get(self):
+    @staticmethod
+    def get():
         return jsonify(DEFAULT_RESPONSE)
 
 
 class Frequency(Resource):
-    def get(self):
+    @staticmethod
+    def get():
         char_freq = ANALYSER.get_char_frequency()
         result_arr = _create_letter_freq_arr(
             char_freq.keys(), char_freq.values()
@@ -70,7 +73,8 @@ class Frequency(Resource):
 
 
 class Keys(Resource):
-    def get(self):
+    @staticmethod
+    def get():
         result = dict()
         result['key_len_list'] = ANALYSER.get_key_len_list()
         key_select, key_list = ANALYSER.get_keys()
@@ -80,7 +84,8 @@ class Keys(Resource):
 
 
 class KeyGetter(Resource):
-    def get(self, key_id):
+    @staticmethod
+    def get(key_id):
         result = {'cipher_type': 'Vigener', 'cipher': ANALYSER.cipher}
         key_id = int(key_id)
         result['cipher'] = ANALYSER.get_cipher()
@@ -90,7 +95,8 @@ class KeyGetter(Resource):
 
 
 class Decrypter(Resource):
-    def get(self, key, rot):
+    @staticmethod
+    def get(key, rot):
         result = dict([('cipher_type', 'Vigener'), ('cipher', ANALYSER.cipher)])
         result['decrypted_text'] = ANALYSER.decipher(custom_key=key, rot=rot)
 
@@ -98,7 +104,8 @@ class Decrypter(Resource):
 
 
 class KeyLenGetter(Resource):
-    def get(self, key_id):
+    @staticmethod
+    def get(key_id):
         result = {'cipher_type': 'Vigener', 'cipher': ANALYSER.cipher}
         est_len = ANALYSER.get_key_len(key_ord=key_id)
         if est_len < 0:
@@ -114,7 +121,7 @@ API.add_resource(Frequency, '/frequency')  # frequency analysis
 API.add_resource(Keys, '/keys')  # list of key lengths
 API.add_resource(KeyGetter, '/keys/<int:key_id>')  # key len by order
 API.add_resource(KeyLenGetter, '/keys/len/<int:key_id>')  # key len by order
-API.add_resource(Decrypter, '/decrypt/key=<string:key>&rot=<int:rot>')
+API.add_resource(Decrypter, '/decrypt/key=<string:key>&rot=<int:rot>')  # decrypter
 
 
 if __name__ == '__main__':
