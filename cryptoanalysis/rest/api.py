@@ -125,5 +125,5 @@ API.add_resource(Decrypter, '/decrypt/key=<string:key>&rot=<int:rot>')  # decryp
 
 
 if __name__ == '__main__':
-    APP.run(port='5002')
+    APP.run(port=5002)
 
