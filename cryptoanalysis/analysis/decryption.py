@@ -7,6 +7,10 @@ from collections import Counter, deque
 from matplotlib import pyplot as plt
 from cryptoanalysis.cipher import vigener
 
+import cryptoanalysis
+
+META_DIR = "%s/meta" % cryptoanalysis.__path__[0]
+
 
 class Analyser:
 
@@ -33,7 +37,7 @@ class Analyser:
         self.type = cipher_type
         self.lang = lang
 
-        _lang_df = pd.read_csv('meta/{lang}.csv'.format(lang=self.lang))
+        _lang_df = pd.read_csv('{meta_dir}/{lang}.csv'.format(meta_dir=META_DIR, lang=self.lang))
 
         self.alphabet = _lang_df.letters.values
         self.letter_frequency = _lang_df.occurence.values
