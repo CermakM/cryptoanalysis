@@ -1,4 +1,4 @@
-"""Simplistic REST API"""
+"""Simplistic REST api"""
 
 from flask import Flask, jsonify
 from flask_restful import Resource, Api, reqparse
@@ -6,8 +6,8 @@ from flask_restful import Resource, Api, reqparse
 from cryptoanalysis.analysis import decryption
 
 
-APP = Flask(__name__)
-API = Api(APP)
+app = Flask(__name__)
+api = Api(app)
 
 PARSER = reqparse.RequestParser()
 PARSER.add_argument('data')
@@ -64,7 +64,7 @@ class Analysis(Resource):
 class Frequency(Resource):
     @staticmethod
     def get():
-        char_freq = ANALYSER.get_char_frequency()
+        char_freq = ANALYSER.get_char_occurance()
         result_arr = _create_letter_freq_arr(
             char_freq.keys(), char_freq.values()
         )
@@ -116,14 +116,14 @@ class KeyLenGetter(Resource):
 
 
 # Add resources
-API.add_resource(Analysis, '/')
-API.add_resource(Frequency, '/frequency')  # frequency analysis
-API.add_resource(Keys, '/keys')  # list of key lengths
-API.add_resource(KeyGetter, '/keys/<int:key_id>')  # key len by order
-API.add_resource(KeyLenGetter, '/keys/len/<int:key_id>')  # key len by order
-API.add_resource(Decrypter, '/decrypt/key=<string:key>&rot=<int:rot>')  # decrypter
+api.add_resource(Analysis, '/')
+api.add_resource(Frequency, '/frequency')  # frequency analysis
+api.add_resource(Keys, '/keys')  # list of key lengths
+api.add_resource(KeyGetter, '/keys/<int:key_id>')  # key len by order
+api.add_resource(KeyLenGetter, '/keys/len/<int:key_id>')  # key len by order
+api.add_resource(Decrypter, '/decrypt/key=<string:key>&rot=<int:rot>')  # decrypter
 
 
 if __name__ == '__main__':
-    APP.run(port=5002)
+    app.run(port=5002)
 

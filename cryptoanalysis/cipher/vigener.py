@@ -41,8 +41,8 @@ def destrip_blacklist(stream: str, feed_dict: dict) -> str:
 
     if not feed_dict:
         from sys import stderr
-        print("vigener.destrip_blacklist: [WARNING]: empty feed_dict provided - stripping will not be performed",
-              file=stderr)
+        # print("vigener.destrip_blacklist: [WARNING]: empty feed_dict provided - stripping will not be performed",
+        #       file=stderr)
 
         return stream
 
@@ -100,6 +100,9 @@ def decode(cipher: str, key: str, rot: int = 1, strip=True) -> str:
     :param strip: perform strip, bool (True default)
     :return: decoded string
     """
+    if not key:
+        return cipher
+
     encoded_stream, blacklist_dict = cipher, {}
     if strip:
         encoded_stream, blacklist_dict = strip_blacklist(cipher)

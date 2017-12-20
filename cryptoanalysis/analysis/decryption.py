@@ -49,9 +49,16 @@ class Analyser:
         """Returns ciphered text"""
         return self.cipher
 
-    def get_char_frequency(self):
-        """Returns bag of character occurence frequency"""
+    def get_char_occurance(self):
+        """Returns bag of character occurence count"""
         return Counter(self.cipher_strip)
+
+    def get_char_frequency(self) -> dict:
+        """Returns dictionary of characters and their occurence"""
+        series = pd.Series(Counter(self.cipher_strip))
+        series /= series.sum()
+
+        return series.to_dict()
 
     def plot_char_frequency(self):
         """Plot frequency analysis using pandas DataFrame"""
