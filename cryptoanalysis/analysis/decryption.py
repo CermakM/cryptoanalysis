@@ -37,6 +37,9 @@ class Analyser:
         self.type = cipher_type
         self.lang = lang
 
+        # Convenient dictionary to store per-key shift vectors
+        self.shift_dict = dict()
+
         _lang_df = pd.read_csv('{meta_dir}/{lang}.csv'.format(meta_dir=META_DIR, lang=self.lang))
 
         self.alphabet = _lang_df.letters.values
@@ -59,6 +62,13 @@ class Analyser:
         series /= series.sum()
 
         return series.to_dict()
+
+    def get_shift_vector(self, key_index) -> list:
+        """Returns shift vector for key character on specific index"""
+        if not self.shift_dict:
+            return []
+
+        return self.shift_dict[key_index]
 
     def plot_char_frequency(self):
         """Plot frequency analysis using pandas DataFrame"""
@@ -136,7 +146,13 @@ class Analyser:
                     strip_frequency.rotate(1)
 
                 shift_matrix = np.array(shift_list)
-                shift_vector = np.matmul(shift_matrix, np.resize(self.letter_frequency, new_shape=shift_matrix[0].shape))
+                shift_vector = np.matmul(shift_matrix, np.resize(self.letter_frequency,
+                                                                 new_shape=shift_matrix[0].shape))
+
+                # Get first five (magic) shifts and cache them
+                shift_tuples = np.array([*enumerate(shift_vector)])
+                shift_list = sorted(shift_tuples, key=lambda x: x[1], reverse=True)[:5]
+                self.shift_dict[index] = [shift for shift, _ in shift_list]
 
                 shift_index = int(np.argmax(shift_vector))
 
