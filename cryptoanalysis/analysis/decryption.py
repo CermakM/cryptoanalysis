@@ -99,10 +99,11 @@ class Analyser:
             key, _ = self.get_keys(key_id, rot=rot)
             # print("Guessing key: '%s'" % key)
         else:
-            key = custom_key
+            # Apply rotation to the custom key instead of the text
+            key = [chr(ord(k) + rot) for k in custom_key]
 
         # Apply the key to decode stream
-        decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=rot if custom_key else 0, strip=False)
+        decoded_stream = vigener.decode(self.cipher_strip, key=key, strip=False)
 
         decoded_stream = vigener.destrip_blacklist(decoded_stream, feed_dict=self.blacklist_dict)
 
