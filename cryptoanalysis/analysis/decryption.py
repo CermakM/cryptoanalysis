@@ -103,7 +103,7 @@ class Analyser:
             # print("Guessing key: '%s'" % key)
         else:
             # Apply rotation to the custom key instead of the text
-            key = "".join(chr(ord(k) + rot) for k in custom_key)
+            key = custom_key
 
         # Apply the key to decode stream
         decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=rot, strip=False)
