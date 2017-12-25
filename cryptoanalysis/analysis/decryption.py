@@ -85,7 +85,7 @@ class Analyser:
         ax.legend(['Character count'])
         plt.show()
 
-    def decipher(self, custom_key=None, key_id=0, rot=1) -> str:
+    def decipher(self, custom_key=None, key_id=0, rot=0) -> str:
         """
         Attempt to break cipher using rotation hyperparameter
         :param custom_key: key to be used, if known
@@ -96,22 +96,23 @@ class Analyser:
 
         # Attempt to decrypt the key
         if custom_key is None:
-            key, _ = self.get_keys(key_id)
+            key, _ = self.get_keys(key_id, rot=rot)
             # print("Guessing key: '%s'" % key)
         else:
             key = custom_key
 
         # Apply the key to decode stream
-        decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=rot, strip=False)
+        decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=rot if custom_key else 0, strip=False)
 
         decoded_stream = vigener.destrip_blacklist(decoded_stream, feed_dict=self.blacklist_dict)
 
         return decoded_stream
 
-    def get_keys(self, key_id=0) -> (str, list):
+    def get_keys(self, key_id=0, rot=0) -> (str, list):
         """
         Attempt to decrypt the Vigener key
         :param key_id: length of the key to be returned
+        :param rot: 'a' transforms to 'a' for 0, to 'b' for 1 (default)
         :return: decrypted key with highest probability, list of possible keys for different lengths
         """
 
@@ -138,7 +139,6 @@ class Analyser:
                 # Convert occurence to frequency and put it into deque to rotate easily
                 strip_frequency = deque([v / len(cipher_strip_bag)*100 for k, v in cipher_strip_list])
 
-                # TODO: handle shifts by user
                 # Create shift matrix
                 shift_list = []
                 for i in range(len(strip_frequency)):
@@ -152,13 +152,13 @@ class Analyser:
                 # Get first five (magic) shifts and cache them
                 shift_tuples = np.array([*enumerate(shift_vector)])
                 shift_list = sorted(shift_tuples, key=lambda x: x[1], reverse=True)[:5]
-                self.shift_dict[index] = [shift for shift, _ in shift_list]
+                self.shift_dict[index] = [shift - rot for shift, _ in shift_list]
 
                 shift_index = int(np.argmax(shift_vector))
 
-                # Rotate to the peak position letters to the peak position
+                # Rotate letters to the peak position
                 shift_sample = deque(k for k, v in cipher_strip_list)
-                shift_sample.rotate(shift_index + 1)  # Number of rotations is shift index + 1
+                shift_sample.rotate(shift_index + rot)  # Number of rotations is shift index + rotation value
 
                 key += shift_sample[0]
 
