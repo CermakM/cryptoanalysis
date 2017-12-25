@@ -11,7 +11,6 @@ def encode(string: str, key: str) -> str:
     Encode string using the Caesar cipher with the given key
     :param string: string to be encoded
     :param key: letter to be used as given shift
-    :param rot: 'a' transforms to 'a' for 0, to 'b' for 1 (default)
     :return: encoded string
     :raises: ValueError if key len is invalid
     """

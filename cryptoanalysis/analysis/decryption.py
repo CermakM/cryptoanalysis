@@ -90,9 +90,12 @@ class Analyser:
         Attempt to break cipher using rotation hyperparameter
         :param custom_key: key to be used, if known
         :param key_id: id of the key to be used for decryption
-        :param rot: 'a' transforms to 'a' for 0, to 'b' for 1 (default)
+        :param rot: 'a' transforms to 'a' for 0 (default), to 'b' for 1
         :return: decrypted stream
         """
+
+        if custom_key and key_id:
+            raise(AttributeError("`custom_key` and `key_id` must be used exclusively"))
 
         # Attempt to decrypt the key
         if custom_key is None:
@@ -100,10 +103,12 @@ class Analyser:
             # print("Guessing key: '%s'" % key)
         else:
             # Apply rotation to the custom key instead of the text
-            key = [chr(ord(k) + rot) for k in custom_key]
+            key = "".join(chr(ord(k) + rot) for k in custom_key)
+
+        print(key)
 
         # Apply the key to decode stream
-        decoded_stream = vigener.decode(self.cipher_strip, key=key, strip=False)
+        decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=0, strip=False)
 
         decoded_stream = vigener.destrip_blacklist(decoded_stream, feed_dict=self.blacklist_dict)
 

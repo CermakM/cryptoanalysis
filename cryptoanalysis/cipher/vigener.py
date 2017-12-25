@@ -58,7 +58,7 @@ def destrip_blacklist(stream: str, feed_dict: dict) -> str:
     return _stream
 
 
-def encode(stream: str, key: str, blacklist: list = None, rot: int = 1) -> str:
+def encode(stream: str, key: str, blacklist: list = None, rot: int = 0) -> str:
     """
     Encode string using the Vigener cipher with the given key
     :param stream: string to be encoded
@@ -91,7 +91,7 @@ def encode(stream: str, key: str, blacklist: list = None, rot: int = 1) -> str:
     return encoded_stream
 
 
-def decode(cipher: str, key: str, rot: int = 1, strip=True) -> str:
+def decode(cipher: str, key: str, rot: int = 0, strip=True) -> str:
     """
     Decode string using the Vigener cipher with the given key
     :param cipher:  ciphered text stream to be decoded
