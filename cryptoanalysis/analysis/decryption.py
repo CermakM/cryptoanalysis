@@ -106,7 +106,7 @@ class Analyser:
             key = "".join(chr(ord(k) + rot) for k in custom_key)
 
         # Apply the key to decode stream
-        decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=0, strip=False)
+        decoded_stream = vigener.decode(self.cipher_strip, key=key, rot=rot, strip=False)
 
         decoded_stream = vigener.destrip_blacklist(decoded_stream, feed_dict=self.blacklist_dict)
 
@@ -152,11 +152,10 @@ class Analyser:
                 shift_matrix = np.array(shift_list)
                 shift_vector = np.matmul(shift_matrix, np.resize(self.letter_frequency,
                                                                  new_shape=shift_matrix[0].shape))
-
                 # Get first five (magic) shifts and cache them
                 shift_tuples = np.array([*enumerate(shift_vector)])
                 shift_list = sorted(shift_tuples, key=lambda x: x[1], reverse=True)[:5]
-                self.shift_dict[index] = [shift - rot for shift, _ in shift_list]
+                self.shift_dict[index] = [int(shift) for shift, _ in shift_list]
 
                 shift_index = int(np.argmax(shift_vector))
 

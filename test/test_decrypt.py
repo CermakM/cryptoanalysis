@@ -1,10 +1,10 @@
 from cryptoanalysis.analysis import decryption
 
-with open("samples/TIKcipher2b.txt") as sample:
+with open("samples/TIKcipher2a.txt") as sample:
     encoded_text = sample.read()
 
 analyser = decryption.Analyser(encoded_text)
-print(analyser.get_keys())
-decrypted = analyser.decipher(custom_key='churchill', rot=0)
+# decrypted = analyser.decipher(custom_key='onrktrmdgktrhl', rot=1)
+decrypted = analyser.decipher(key_id=2, rot=1)
 
 print("decrypted text: ", decrypted)
