@@ -2,6 +2,7 @@
 Simplistic monoalphabetic cipher analyser and decryptor
 
 <br>
+
 ---
 #### Install instructions:
 - `git clone https://github.com/CermakM/cryptoanalysis.git`
@@ -13,6 +14,7 @@ Simplistic monoalphabetic cipher analyser and decryptor
 __Note:__ Project is not compatible with python2
 
 <br>
+
 ---
 #### Usage of Jupyter notebook:
 
